@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+    <title>Master Cut Plan - Core Dashboard</title>
+
+    <!-- PWA: Web App Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0b0f19">
+
+    <!-- PWA: iOS-specific tags (Add to Home Screen support) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cut Plan">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+    <!-- PWA: Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    <style>
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #0b0f19; color: #f1f5f9; margin: 0; padding: 0; padding-bottom: 60px; }
+        
+        .header { background: linear-gradient(135deg, #111827 0%, #0b0f19 100%); border-bottom: 1px solid #1f2937; padding: 25px 20px; text-align: center; }
+        .header h1 { margin: 0; font-size: 18pt; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; }
+        .header p { margin: 6px 0 0 0; color: #9ca3af; font-size: 9.5pt; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        
+        .nav-container { max-width: 1100px; margin: 15px auto 0 auto; padding: 0 10px; }
+        .main-tabs { display: flex; gap: 5px; border-bottom: 2px solid #1f2937; margin-bottom: 15px; overflow-x: auto; }
+        .main-tab-btn { flex: 1; padding: 14px 5px; background: #111827; border: 1px solid #1f2937; border-bottom: none; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: 700; color: #9ca3af; font-size: 9.5pt; text-align: center; transition: all 0.2s; white-space: nowrap; }
+        .main-tab-btn.active { background: #1f2937; color: #ef4444; border-top: 2px solid #ef4444; }
+
+        /* Day Sub-Navigation Pills Strip */
+        .day-nav-container { display: none; gap: 8px; margin-bottom: 20px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; }
+        .day-nav-container::-webkit-scrollbar { display: none; }
+        .day-pill { background-color: #111827; color: #9ca3af; border: 1px solid #1f2937; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 9pt; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .day-pill.active { background-color: #ef4444; color: #ffffff; border-color: #ef4444; font-weight: 700; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2); }
+
+        .main-container { max-width: 1100px; margin: 0 auto; padding: 0 15px; }
+        .panel { display: none; }
+        .panel.active { display: block; }
+        .day-panel { display: none; }
+        .day-panel.active { display: block; }
+
+        .section-intro { background: #1e1b4b; border-left: 4px solid #6366f1; padding: 15px; border-radius: 6px; margin-bottom: 25px; font-size: 10pt; color: #e5e7eb; line-height: 1.5; }
+        
+        .grid-layout { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        @media(min-width: 768px) { .grid-layout { grid-template-columns: 1fr 1fr; } }
+
+        .card { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .card-title { font-size: 13pt; font-weight: 700; color: #ffffff; margin-bottom: 15px; border-bottom: 1px solid #1f2937; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .badge { font-size: 8pt; padding: 3px 8px; border-radius: 12px; font-weight: 700; text-transform: uppercase; }
+        .badge.train { background: #065f46; color: #34d399; }
+        .badge.rest { background: #1e3a8a; color: #93c5fd; }
+        .badge.interactive { background-color: #c2410c; color: #ffffff; }
+
+        .meal-row { margin-bottom: 18px; border-bottom: 1px dashed #1f2937; padding-bottom: 12px; }
+        .meal-row:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+        .meal-meta { font-size: 8pt; font-weight: 700; color: #9ca3af; text-transform: uppercase; }
+        .meal-name { font-size: 11pt; font-weight: 700; color: #f9fafb; margin: 3px 0; }
+        .meal-ingredients { font-size: 9.5pt; color: #d1d5db; line-height: 1.4; }
+        
+        .macro-pill-box { display: flex; gap: 6px; margin-top: 6px; }
+        .macro-pill { background: #0b0f19; padding: 3px 8px; border-radius: 4px; font-size: 8pt; font-weight: 600; color: #cbd5e1; }
+        .macro-pill span { color: #f3f4f6; font-weight: 700; }
+
+        .summary-box { background: #0b0f19; border: 1px solid #1f2937; border-radius: 8px; padding: 12px; margin-top: 15px; display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; gap: 5px; }
+        .summary-item .lbl { font-size: 7pt; color: #9ca3af; text-transform: uppercase; font-weight: 700; }
+        .summary-item .val { font-size: 11pt; font-weight: 800; color: #ffffff; margin-top: 2px; }
+        .summary-item.highlight .val { color: #ef4444; }
+
+        /* Logger Interactive Controls & Field Styling */
+        .log-controls { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; background-color: #0b0f19; padding: 12px; border-radius: 8px; border: 1px solid #1f2937; }
+        .log-label { font-size: 9.5pt; font-weight: 700; color: #9ca3af; }
+        .date-picker { background-color: #1f2937; border: 1px solid #334155; color: #ffffff; padding: 6px 10px; border-radius: 6px; font-weight: 700; font-size: 9.5pt; outline: none; }
+        .date-picker:focus { border-color: #ef4444; }
+        .btn-save-log { background-color: #ef4444; color: #ffffff; border: none; padding: 7px 16px; border-radius: 6px; font-weight: 700; font-size: 9.5pt; cursor: pointer; }
+        .btn-save-log:hover { background-color: #dc2626; }
+
+        .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 10px; border: 1px solid #1f2937; border-radius: 8px; }
+        .workout-table { width: 100%; border-collapse: collapse; font-size: 9.5pt; text-align: left; min-width: 800px; }
+        .workout-table th { background: #0b0f19; color: #9ca3af; padding: 12px 10px; font-weight: 700; text-transform: uppercase; border-bottom: 2px solid #1f2937; font-size: 8.5pt; }
+        .workout-table td { padding: 12px 10px; border-bottom: 1px solid #1f2937; color: #e5e7eb; vertical-align: middle; }
+        .workout-table tr:last-child td { border-bottom: none; }
+        
+        .ex-name { font-weight: 700; color: #ffffff; font-size: 10pt; }
+        .ex-star { color: #f59e0b; font-size: 9pt; margin-left: 4px; }
+        .ex-sublabel { display: block; font-size: 8.5pt; color: #94a3b8; margin-top: 2px; }
+
+        .set-box-pair { display: inline-flex; align-items: center; gap: 4px; background-color: #1f2937; padding: 4px; border-radius: 6px; border: 1px solid #334155; }
+        .set-box-pair.disabled-pair { background-color: #0b0f19; border-color: #1f2937; opacity: 0.35; }
+        .sub-input { background-color: #0b0f19; border: 1px solid #334155; color: #ffffff; padding: 5px; border-radius: 4px; font-weight: 700; width: 52px; text-align: center; font-size: 9pt; }
+        .sub-input:focus { border-color: #ef4444; outline: none; }
+        .sub-input::placeholder { color: #4b5563; font-weight: 400; font-size: 7.5pt; }
+        .input-lbl { font-size: 7.5pt; color: #9ca3af; font-weight: 700; text-transform: uppercase; }
+
+        .auto-calc-display { font-family: monospace; font-size: 8.5pt; line-height: 1.4; color: #10b981; margin-top: 5px; font-weight: 600; display: block; }
+        .pyramider-card { display: none; background-color: #1e1b4b; border: 1px solid #4338ca; border-radius: 8px; padding: 10px; margin-top: 8px; font-size: 8.5pt; color: #cbd5e1; line-height: 1.5; }
+        .pyramider-card ul { margin: 4px 0 0 0; padding-left: 14px; }
+        
+        .mod-text { font-size: 8.5pt; color: #f59e0b; font-weight: 600; display: block; line-height: 1.3; }
+        .stable-text { font-size: 8.5pt; color: #10b981; font-weight: 600; display: block; line-height: 1.3; }
+        .danger-text { font-size: 8.5pt; color: #f87171; font-weight: 700; display: block; line-height: 1.3; }
+        
+        /* Multi-day overlap alert system styles */
+        .overlap-highlight { font-size: 8.5pt; color: #a78bfa; font-weight: 700; display: block; line-height: 1.3; border: 1px dashed #5b21b6; padding: 4px 8px; border-radius: 4px; background-color: #2e1065; margin-top: 4px; }
+
+        .history-section { margin-top: 25px; border-top: 1px dashed #1f2937; padding-top: 15px; }
+        .history-hdr { font-size: 9pt; font-weight: 700; color: #9ca3af; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .history-terminal { background-color: #0b0f19; border: 1px solid #1f2937; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 9pt; color: #cbd5e1; line-height: 1.5; max-height: 180px; overflow-y: auto; white-space: pre-wrap; }
+
+        .directives-list { padding-left: 18px; margin: 0; }
+        .directives-list li { margin-bottom: 8px; font-size: 9.5pt; color: #d1d5db; line-height: 1.4; }
+        .shopping-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 10px; }
+        @media(min-width: 768px) { .shopping-grid { grid-template-columns: 1fr 1fr; } }
+        .shop-block { background: #0b0f19; border: 1px solid #1f2937; border-radius: 8px; padding: 15px; }
+        .shop-block h4 { margin-top: 0; margin-bottom: 10px; color: #ef4444; font-size: 11pt; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #1f2937; padding-bottom: 5px; }
+        
+        .vo2-guide-container { background-color: #1c1917; border: 1px solid #78350f; border-radius: 8px; padding: 14px; margin-top: 15px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+        .vo2-card-sub { font-size: 8.5pt; line-height: 1.4; color: #fef3c7; }
+        .vo2-card-sub h4 { color: #f59e0b; margin: 0 0 4px 0; text-transform: uppercase; font-size: 8pt; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Master Cut Plan</h1>
+    <p>Integrated 5-Day Workout Dashboard</p>
+</div>
+
+<div class="nav-container">
+    <div class="main-tabs">
+        <button class="main-tab-btn active" onclick="switchMainTab('nutrition', this)">🥩 Caloric Blueprint</button>
+        <button class="main-tab-btn" onclick="switchMainTab('workout', this)">🏋️‍♂️ Workout Tracker</button>
+        <button class="main-tab-btn" onclick="switchMainTab('shopping', this)">🛒 Shopping List</button>
+        <button class="main-tab-btn" onclick="switchMainTab('prep', this)">🥘 Prep Guide</button>
+    </div>
+
+    <!-- Sub-Navigation Strip (Directly synced with Workout Tracker Tab) -->
+    <div class="day-nav-container" id="workout-day-nav">
+        <button class="day-pill active" onclick="tabTo('mon', this)">Mon: Upper</button>
+        <button class="day-pill" onclick="tabTo('tue', this)">Tue: Lower</button>
+        <button class="day-pill" onclick="tabTo('thu', this)">Thu: Pull</button>
+        <button class="day-pill" onclick="tabTo('fri', this)">Fri: Push</button>
+        <button class="day-pill" onclick="tabTo('sat', this)">Sat: Arms & VO₂</button>
+    </div>
+</div>
+
+<div class="main-container">
+
+    <!-- ================= NUTRITION INTERFACE (CALORIC BLUEPRINT) ================= -->
+    <div id="nutrition" class="panel active">
+        <div class="section-intro">
+            <strong>🔥 Optimized Chrono-Spacing Updates:</strong> Meal timings have been fully realigned to maximize training energy for your 1:00 PM workouts and protect deep recovery. Fast protein isolates protect the morning fast, while whole food dinners wrap up safely ahead of your 9:30 PM bedtime.
+        </div>
+
+        <div class="grid-layout">
+            <!-- TRAINING DAY DIET -->
+            <div class="card">
+                <div class="card-title">
+                    <span>Training Days Diet Plan</span>
+                    <span class="badge train">5 Days / Wk</span>
+                </div>
+                
+                <div class="meal-row">
+                    <div class="meal-meta">05:30 AM — Meal 1</div>
+                    <div class="meal-name">GI Prime & Hydration</div>
+                    <div class="meal-ingredients">1 tbsp Psyllium Husk Powder mixed aggressively in 12–16 oz cold water. Drink immediately.</div>
+                    <div class="macro-pill-box">
+                        <div class="macro-pill">P: <span>0g</span></div><div class="macro-pill">C: <span>4g</span></div><div class="macro-pill">F: <span>0g</span></div><div class="macro-pill"><span>~15 cal</span></div>
+                    </div>
+                </div>
+
+                <div class="meal-row">
+                    <div class="meal-meta">06:00 AM — Meal 2</div>
+                    <div class="meal-name">Creamy Almond Milk Oats & Isopure Isolate</div>
+                    <div class="meal-ingredients">40g Rolled Oats, 1 Scoop Isopure Whey Isolate (100 cal | 25g P | 0g C | 0g F), 140g Almond Breeze Unsweetened Almondmilk, 1 Medium Banana.</div>
+                    <div class="macro-pill-box">
+                        <div class="macro-pill">P: <span>31.9g</span></div><div class="macro-pill">C: <span>54.6g</span></div><div class="macro-pill">F: <span>4.2g</span></div><div class="macro-pill"><span>~373 cal</span></div>
+                    </div>
+                </div>
+
+                <div class="meal-row">
+                    <div class="meal-meta">10:00 AM — Meal 3 (Mid-Morning Protection Bridge)</div>
+                    <div class="meal-name">Anti-Catabolic Isolate Shake</div>
+                    <div class="meal-ingredients">1 Scoop Protein Powder (your blend: 140 cal | 25g P | 0g C | 0g F) in water. <em style="color:#34d399;">Moved far forward from bedtime to close the morning fasting gap.</em></div>
+                    <div class="macro-pill-box">
+                        <div class="macro-pill">P: <span>25g</span></div><div class="macro-pill">C: <span>0g</span></div><div class="macro-pill">F: <span>0g</span></div><div class="macro-pill"><span>~100 cal</span></div>
+                    </div>
+                </div>
+
+                <div class="meal-row">
+                    <div class="meal-meta">12:00 PM — Meal 4 (Pre-Workout Fuel Engine)</div>
+                    <div class="meal-name">Chicken & Rice Glycogen Priming Block</div>
+                    <div class="meal-ingredients"><strong>151g Cooked Chicken Breast</strong>, <strong>115g Cooked Jasmine Rice</strong>, 4.5 oz Fresh Broccoli (<em style="color:#f59e0b;">air-fry fresh before serving</em>), <strong>0.75 tsp (3.5g) Olive Oil</strong>. <em style="color:#34d399;">Eat 60 mins before your 1:00 PM gym session.</em></div>
+                    <div class="macro-pill-box">
+                        <div class="macro-pill">P: <span>53.3g</span></div><div class="macro-pill">C: <span>38.2g</span></div><div class="macro-pill">F: <span>8.9g</span></div><div class="macro-pill"><span>~446 cal</span></div>
+                    </div>
+                </div>
+
+                <div class="meal-row">
+                    <div class="meal-meta">02:30 PM — Meal 5</div>
+                    <div class="meal-name">Post-Workout Recovery Shake</div>
+                    <div class="meal-ingredients">1 Scoop Protein Powder (your blend: 140 cal | 24g P | 4g C | 3g F) mixed with water, 1 Medium Apple.</div>
+                    <div class="macro-pill-box">
+                        <div class="macro-pill">P: <span>24.5g</span></div><div class="macro-pill">C: <span>29g</span></div><div class="macro-pill">F: <span>3g</span></div><div class="macro-pill"><span>~241 cal</span></div>
+                    </div>
+                </div>
+
+                <div class="meal-row">
+                    <div class="meal-meta">06:30 PM — Meal 6 (Final Daily Food Anchor)</div>
+                    <div class="meal-name">Beef & Potato Recovery Dinner</div>
+                    <div class="meal-ingredients"><strong>140g Cooked 90% Lean Ground Beef</strong>, <strong>135g Cooked Yellow Potatoes</strong> (<em>Weigh 170g Raw</em>), 4.0 oz Fresh String Beans (<em style="color:#f59e0b;">boil fresh before serving</em>), <strong>0.75 tsp (3.5g) Olive Oil</strong>. <em style="color:#ef4444;">Take 2 Fish Oil Softgels. Last meal finishes 3 full hours before 9:30 PM bedtime.</em></div>
+                    <div class="macro-pill-box">
+                        <div class="macro-pill">P: <span>41.1g</span></div><div class="macro-pill">C: <span>30g</span></div><div class="macro-pill">F: <span>19.5g</span></div><div class="macro-pill"><span>~472 cal</span></div>
+                    </div>
+                </div>
+
+                <div class="summary-box">
+                    <div class="summary-item"><div class="lbl">Calories</div><div class="val">1,647</div></div>
+                    <div class="summary-item highlight"><div class="lbl">Protein</div><div class="val">175.8g</div></div>
+                    <div class="summary-item"><div class="lbl">Carbs</div><div class="val">155.8g</div></div>
+                    <div class="summary-item"><div class="lbl">Fat</div><div class="val">35.6g</div></div>
+                </div>
+            </div>
+
+            <!-- REST DAY DIET -->
+            <div class="card">
+                <div class="card-title">
+                    <span>Rest Days Diet Plan</span>
+                    <span class="badge rest">Wed & Sun</span>
+                </div>
+                
+                <div class="meal-row">
+                    <div class="meal-meta">05:30 AM — Meal 1</div>
+                    <div class="meal-name">GI Prime & Hydration</div>
+                    <div class="meal-ingredients">1 tbsp Psyllium Husk Powder mixed aggressively in 12–16 oz cold water.</div>
+                    <div class="macro-pill-box">
+                        <div class="macro-pill">P: <span>0g</span></div><div class="macro-pill">C: <span>4g</span></div><div class="macro-pill">F: <span>0g</span></div><div class="macro-pill"><span>~15 cal</span></div>
+                    </div>
+                </div>
+
+                <div class="meal-row">
+                    <div class="meal-meta">06:00 AM — Meal 2</div>
+                    <div class="meal-name">Whole Egg Thermal Omelet</div>
+                    <div class="meal-ingredients">4 Whole Eggs, 150g Fresh Spinach, 100g Mushrooms, 1 tsp Olive Oil.</div>
+                    <div class="macro-pill-box">
+                        <div class="macro-pill">P: <span>26g</span></div><div class="macro-pill">C: <span>6g</span></div><div class="macro-pill">F: <span>25g</span></div><div class="macro-pill"><span>~353 cal</span></div>
+                    </div>
+                </div>
+
+                <div class="meal-row">
+                    <div class="meal-meta">10:30 AM — Meal 3</div>
+                    <div class="meal-name">Lean Tuna Visual Volume Salad</div>
+                    <div class="meal-ingredients">160g Canned Tuna in Water, 200g Mixed Greens, Diced Cucumber. <em style="color:#ef4444;">Dressed with a full serving (2 Tbsp / 30mL) of dressing.</em></div>
+                    <div class="macro-pill-box">
+                        <div class="macro-pill">P: <span>44g</span></div><div class="macro-pill">C: <span>6g</span></div><div class="macro-pill">F: <span>5.5g</span></div><div class="macro-pill"><span>~275 cal</span></div>
+                    </div>
+                </div>
+
+                <div class="meal-row">
+                    <div class="meal-meta">02:30 PM — Meal 4</div>
+                    <div class="meal-name">Chicken Breast Energy Protection</div>
+                    <div class="meal-ingredients">140g Cooked Chicken Breast, 200g Fresh Broccoli (<em style="color:#f59e0b;">air-fry fresh before serving</em>), 1/2 Medium Avocado.</div>
+                    <div class="macro-pill-box">
+                        <div class="macro-pill">P: <span>46g</span></div><div class="macro-pill">C: <span>15g</span></div><div class="macro-pill">F: <span>12g</span></div><div class="macro-pill"><span>~352 cal</span></div>
+                    </div>
+                </div>
+
+                <div class="meal-row">
+                    <div class="meal-meta">06:00 PM — Meal 5</div>
+                    <div class="meal-name">Pure Protein Sub-Calorie Dinner</div>
+                    <div class="meal-ingredients">140g Cooked Chicken Breast, 200g Fresh Asparagus (<em style="color:#f59e0b;">air-fry fresh before serving</em>), 1.5 tsp Olive Oil. <em style="color:#ef4444;">Take 2 Fish Oil Softgels. Finishes 3.5 hours clear of bedtime.</em></div>
+                    <div class="macro-pill-box">
+                        <div class="macro-pill">P: <span>45g</span></div><div class="macro-pill">C: <span>5g</span></div><div class="macro-pill">F: <span>10g</span></div><div class="macro-pill"><span>~292 cal</span></div>
+                    </div>
+                </div>
+
+                <div class="summary-box">
+                    <div class="summary-item"><div class="lbl">Calories</div><div class="val">1,287</div></div>
+                    <div class="summary-item highlight"><div class="lbl">Protein</div><div class="val">161g</div></div>
+                    <div class="summary-item"><div class="lbl">Carbs</div><div class="val">36g</div></div>
+                    <div class="summary-item"><div class="lbl">Fat</div><div class="val">52.5g</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= INTERACTIVE WORKOUT TRACKER INTERFACE ================= -->
+    <div id="workout" class="panel">
+
+        <!-- MONDAY UPPER PANEL -->
+        <div id="panel-mon" class="day-panel active">
+            <div class="card">
+                <div class="card-title">
+                    <span>Interactive Log: (Mon) Upper Body</span>
+                    <span class="badge interactive">Deficit Adjusted</span>
+                </div>
+                <div class="log-controls">
+                    <span class="log-label">Session Date:</span>
+                    <input type="date" id="date-mon" class="date-picker" value="2026-06-26">
+                    <button class="btn-save-log" onclick="saveLedger('mon')">Save Entry</button>
+                </div>
+                <div class="table-container">
+                    <table class="workout-table" id="table-mon">
+                        <thead>
+                            <tr>
+                                <th style="width: 320px;">Exercise</th>
+                                <th style="width: 140px;">Target Layout</th>
+                                <th>Set 1</th>
+                                <th>Set 2 (Drop)</th>
+                                <th>Execution Blueprint</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-name="Machine Bench Press" data-calc-type="pyramid">
+                                <td>
+                                    <span class="ex-name">Machine Bench Press</span><span class="ex-star">★</span>
+                                    <span class="ex-sublabel">⚙️ Pyramider Warmup System Active</span>
+                                    <div class="pyramider-card"></div>
+                                </td>
+                                <td>6-8 Reps</td>
+                                <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                <td><span class="stable-text">Primary horizontal driver. Hold Set 1 weight steady.</span></td>
+                            </tr>
+                            <script>
+                                const monEx = [
+                                    { n: "Lat Pulldown", t: "8-10 / 12-15", o: false, nts: "Back width anchor. Control eccentric tempo on Set 2." },
+                                    { n: "Incline DB Press", t: "6-8 / 10-12", o: false, nts: "Upper chest emphasis. Match week 1 structural baseline." },
+                                    { n: "Seated Row", t: "8-10 / 12-15", o: false, nts: "Mid-back depth. Keep strict posture on both sets." },
+                                    { n: "Seated Dumbbell Shoulder Press", t: "8-10 / 12-15", o: true, nts: "Overhead power preservation." },
+                                    { n: "Face Pulls", t: "12-15 / 15-20", o: false, nts: "Rear delt & rotator cuff alignment focus." },
+                                    { n: "Cable EZ Bar Curl", t: "10-12 / 15-20", o: true, nts: "Arm isolation block. Control contraction peak." },
+                                    { n: "Tricep Pushdowns", t: "10-12 / 15-20", o: false, nts: "Elbow lock extension. Smooth tempo execution." }
+                                ];
+                                monEx.forEach(ex => {
+                                    document.write(`
+                                    <tr data-name="${ex.n}" data-calc-type="drop">
+                                        <td>
+                                            <span class="ex-name">${ex.n}</span><span class="auto-calc-display"></span>
+                                            ${ex.o ? '<span class="overlap-highlight">♻️ Multi-Day Continuity: Match weight to last week\'s target, NOT last session!</span>' : ''}
+                                        </td>
+                                        <td>${ex.t} Reps</td>
+                                        <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                        <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                        <td><span class="stable-text">${ex.nts}</span></td>
+                                    </tr>`);
+                                });
+                            </script>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="history-section"><div class="history-hdr">Saved Log History</div><div class="history-terminal" id="hist-mon">No saved entries.</div></div>
+            </div>
+        </div>
+
+        <!-- TUESDAY LOWER PANEL -->
+        <div id="panel-tue" class="day-panel">
+            <div class="card">
+                <div class="card-title">
+                    <span>Interactive Log: (Tue) Lower Body</span>
+                    <span class="badge interactive">Deficit Adjusted</span>
+                </div>
+                <div class="log-controls">
+                    <span class="log-label">Session Date:</span>
+                    <input type="date" id="date-tue" class="date-picker" value="2026-06-26">
+                    <button class="btn-save-log" onclick="saveLedger('tue')">Save Entry</button>
+                </div>
+                <div class="table-container">
+                    <table class="workout-table" id="table-tue">
+                        <thead>
+                            <tr>
+                                <th style="width: 320px;">Exercise</th>
+                                <th style="width: 140px;">Target Layout</th>
+                                <th>Set 1</th>
+                                <th>Set 2</th>
+                                <th>Set 3</th>
+                                <th>Execution Blueprint</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-name="Leg Press" data-calc-type="pyramid">
+                                <td>
+                                    <span class="ex-name">Leg Press</span><span class="ex-star">★</span>
+                                    <span class="ex-sublabel">⚙️ Warmup System Active</span>
+                                    <div class="pyramider-card"></div>
+                                </td>
+                                <td>6-8 / 10-12</td>
+                                <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                <td><div class="set-box-pair disabled-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input" disabled placeholder="—"></div></td>
+                                <td><span class="danger-text">⚠️ KNEE PROTECTION: Strict 1x Drop Max. High & wide feet. 3s eccentric. No bouncing.</span></td>
+                            </tr>
+                            <script>
+                                const tueEx = [
+                                    { n: "Seated Deadlift", t: "8-10 / 12-15", o: false, c: "drop", nts: "Trimmed to drop-set format to save systemic CNS energy." },
+                                    { n: "Seated Leg Curl", t: "10-12 / 12-15", o: false, c: "drop", nts: "Hamstring protection pattern. Avoid sudden kinetic explosions." },
+                                    { n: "Leg Extension", t: "8-10 / 12-15", o: false, c: "drop", nts: "Quad isolation refinement. Lock top peak carefully." },
+                                    { n: "Cable Pull-Through", t: "12-15 / 15-20", o: false, c: "drop", nts: "Glute/hamstring low structural spine loading." },
+                                    { n: "Calf Raises", t: "10-12 / 15-20", o: false, c: "bodyweight-added", nts: "⚠️ TOTAL WORKLOAD: Enter stack weight. Display adds 145lb bodyweight automatically." },
+                                    { n: "Torso Rotations", t: "10-12 / 12-15", o: false, c: "drop", nts: "Rotational trunk stabilization focus." }
+                                ];
+                                tueEx.forEach(ex => {
+                                    document.write(`
+                                    <tr data-name="${ex.n}" data-calc-type="${ex.c}">
+                                        <td>
+                                            <span class="ex-name">${ex.n}</span><span class="auto-calc-display"></span>
+                                            ${ex.o ? '<span class="overlap-highlight">♻️ Multi-Day Continuity: Match weight to last week\'s target, NOT last session!</span>' : ''}
+                                        </td>
+                                        <td>${ex.t} Reps</td>
+                                        <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                        <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                        <td><div class="set-box-pair disabled-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input" disabled placeholder="—"></div></td>
+                                        <td><span class="mod-text">${ex.nts}</span></td>
+                                    </tr>`);
+                                });
+                            </script>
+                            <tr data-name="Myotatic Crunches">
+                                <td><span class="ex-name">Myotatic Crunches</span></td>
+                                <td>10-12 / 12-15</td>
+                                <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                <td><div class="set-box-pair disabled-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input" disabled placeholder="—"></div></td>
+                                <td><span class="stable-text">Deep abdominal eccentric extension sequence.</span></td>
+                            </tr>
+                            <tr data-name="Ab Wheel">
+                                <td><span class="ex-name">Ab Wheel</span></td>
+                                <td>6-8 / 8-12</td>
+                                <td><div class="set-box-pair"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="BW"></div></td>
+                                <td><div class="set-box-pair"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="BW"></div></td>
+                                <td><div class="set-box-pair disabled-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input" disabled placeholder="—"></div></td>
+                                <td><span class="mod-text">Protect lumbar alignment completely.</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="history-section"><div class="history-hdr">Saved Log History</div><div class="history-terminal" id="hist-tue">No saved entries.</div></div>
+            </div>
+        </div>
+
+        <!-- THURSDAY PULL PANEL -->
+        <div id="panel-thu" class="day-panel">
+            <div class="card">
+                <div class="card-title">
+                    <span>Interactive Log: (Thu) Pull Protocol</span>
+                    <span class="badge interactive">Shoulder-Free Framework</span>
+                </div>
+                <div class="log-controls">
+                    <span class="log-label">Session Date:</span>
+                    <input type="date" id="date-thu" class="date-picker" value="2026-06-26">
+                    <button class="btn-save-log" onclick="saveLedger('thu')">Save Entry</button>
+                </div>
+                <div class="table-container">
+                    <table class="workout-table" id="table-thu">
+                        <thead>
+                            <tr>
+                                <th style="width: 320px;">Exercise</th>
+                                <th style="width: 140px;">Target Layout</th>
+                                <th>Set 1</th>
+                                <th>Set 2</th>
+                                <th>Set 3</th>
+                                <th>Set 4</th>
+                                <th>Execution Blueprint</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-name="Assisted Pull-Ups" data-calc-type="assisted">
+                                <td>
+                                    <span class="ex-name">Assisted Pull-Ups</span><span class="ex-star">★</span>
+                                    <span class="auto-calc-display"></span>
+                                </td>
+                                <td>Triple Drop System</td>
+                                <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="60" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="70"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="90"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                <td><span class="stable-text">🔄 INVERTED COUNTER-BALANCE: Enter top stack setting.</span></td>
+                            </tr>
+                            <script>
+                                const thuEx = [
+                                    { n: "Chest-Supported Row", t: "8-10 / 12-15", o: false, nts: "Upper structural back target. Avoid chin thrusts." },
+                                    { n: "Single-Arm Cable Pulldown", t: "10-12 / 12-15", o: false, nts: "Isolate unilateral lat paths cleanly." },
+                                    { n: "Straight-Arm Pulldown", t: "12-15 / 15-20", o: false, nts: "Strict secondary lat burnout protocol." },
+                                    { n: "Cable EZ Curl", t: "10-12 / 15-20", o: true, nts: "Brachialis execution alignment. Keep elbows tucked." },
+                                    { n: "Rope Hammer Curl", t: "10-12 / 12-15", o: true, nts: "Forearm and arm thickness structural anchor." },
+                                    { n: "Wrist Curls", t: "12-15 / 15-20", o: false, nts: "Forearm flexor isolation maintenance." },
+                                    { n: "Wrist Extensions", t: "12-15 / 15-20", o: false, nts: "Forearm extensor alignment health checks." }
+                                ];
+                                thuEx.forEach(ex => {
+                                    document.write(`
+                                    <tr data-name="${ex.n}" data-calc-type="drop">
+                                        <td>
+                                            <span class="ex-name">${ex.n}</span><span class="auto-calc-display"></span>
+                                            ${ex.o ? '<span class="overlap-highlight">♻️ Multi-Day Continuity: Match weight to last week\'s target, NOT last session!</span>' : ''}
+                                        </td>
+                                        <td>${ex.t} Reps</td>
+                                        <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                        <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                        <td><div class="set-box-pair disabled-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input" disabled placeholder="—"></div></td>
+                                        <td><div class="set-box-pair disabled-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input" disabled placeholder="—"></div></td>
+                                        <td><span class="mod-text">${ex.nts}</span></td>
+                                    </tr>`);
+                                });
+                            </script>
+                            <tr data-name="Hanging Knee Raises">
+                                <td><span class="ex-name">Hanging Knee Raises</span></td>
+                                <td>10-12 / 12-15</td>
+                                <td><div class="set-box-pair"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="BW"></div></td>
+                                <td><div class="set-box-pair"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="BW"></div></td>
+                                <td><div class="set-box-pair disabled-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input" disabled placeholder="—"></div></td>
+                                <td><div class="set-box-pair disabled-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input" disabled placeholder="—"></div></td>
+                                <td><span class="mod-text">Controlled hip flexor/core lower segment raise.</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="history-section"><div class="history-hdr">Saved Log History</div><div class="history-terminal" id="hist-thu">No saved entries.</div></div>
+            </div>
+        </div>
+
+        <!-- FRIDAY PUSH PANEL -->
+        <div id="panel-fri" class="day-panel">
+            <div class="card">
+                <div class="card-title">
+                    <span>Interactive Log: (Fri) Push Protocol</span>
+                    <span class="badge interactive">Deficit Adjusted</span>
+                </div>
+                <div class="log-controls">
+                    <span class="log-label">Session Date:</span>
+                    <input type="date" id="date-fri" class="date-picker" value="2026-06-26">
+                    <button class="btn-save-log" onclick="saveLedger('fri')">Save Entry</button>
+                </div>
+                <div class="table-container">
+                    <table class="workout-table" id="table-fri">
+                        <thead>
+                            <tr>
+                                <th style="width: 320px;">Exercise</th>
+                                <th style="width: 140px;">Target Layout</th>
+                                <th>Set 1</th>
+                                <th>Set 2 (Drop)</th>
+                                <th>Execution Blueprint</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-name="Machine Incline Press" data-calc-type="pyramid">
+                                <td>
+                                    <span class="ex-name">Machine Incline Press</span><span class="ex-star">★</span>
+                                    <span class="ex-sublabel">⚙️ Warmup System Active (Swapped from DB)</span>
+                                    <div class="pyramider-card"></div>
+                                </td>
+                                <td>6-8 Reps</td>
+                                <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                <td><span class="stable-text">Fixed structural path driver. Complete mechanical control emphasis.</span></td>
+                            </tr>
+                            <script>
+                                const friEx = [
+                                    { n: "Pec Dec", t: "10-12 / 12-15", o: false, nts: "Chest isolation squeeze. Limit joint strain extensions." },
+                                    { n: "Seated Dumbbell Shoulder Press", t: "8-10 / 12-15", o: true, nts: "Overhead press safety track." },
+                                    { n: "Cable Lateral Raise", t: "12-15 / 15-20", o: false, nts: "Medial head priority preservation." },
+                                    { n: "Rear Delt Cable Fly", t: "12-15 / 15-20", o: true, nts: "Posterior head line optimization mapping." },
+                                    { n: "Rope Pushdowns", t: "10-12 / 15-20", o: true, nts: "Tricep lateral head expansion track." },
+                                    { n: "Overhead Tricep Extensions", t: "10-12 / 12-15", o: true, nts: "Long head stretch activation focus." }
+                                ];
+                                friEx.forEach(ex => {
+                                    document.write(`
+                                    <tr data-name="${ex.n}" data-calc-type="drop">
+                                        <td>
+                                            <span class="ex-name">${ex.n}</span><span class="auto-calc-display"></span>
+                                            ${ex.o ? '<span class="overlap-highlight">♻️ Multi-Day Continuity: Match weight to last week\'s target, NOT last session!</span>' : ''}
+                                        </td>
+                                        <td>${ex.t} Reps</td>
+                                        <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                        <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                        <td><span class="mod-text">${ex.nts}</span></td>
+                                    </tr>`);
+                                });
+                            </script>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="history-section"><div class="history-hdr">Saved Log History</div><div class="history-terminal" id="hist-fri">No saved entries.</div></div>
+            </div>
+        </div>
+
+        <!-- SATURDAY: ARMS & SHOULDERS PANEL -->
+        <div id="panel-sat" class="day-panel">
+            <div class="card">
+                <div class="card-title">
+                    <span>Interactive Log: (Sat) Arms & Shoulders</span>
+                    <span class="badge interactive">Deficit Adjusted</span>
+                </div>
+                <div class="log-controls">
+                    <span class="log-label">Session Date:</span>
+                    <input type="date" id="date-sat" class="date-picker" value="2026-06-26">
+                    <button class="btn-save-log" onclick="saveLedger('sat')">Save Entry</button>
+                </div>
+                <div class="table-container">
+                    <table class="workout-table" id="table-sat">
+                        <thead>
+                            <tr>
+                                <th style="width: 320px;">Exercise / Conditioning</th>
+                                <th style="width: 140px;">Target Layout</th>
+                                <th>Set / Rd 1</th>
+                                <th>Set / Rd 2</th>
+                                <th>Set / Rd 3</th>
+                                <th>Set / Rd 4</th>
+                                <th>Execution Blueprint</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <script>
+                                const satEx = [
+                                    { n: "Seated DB Shoulder Press", t: "8-10 / 12-15", o: true, nts: "Primary overhead builder preservation focus." },
+                                    { n: "Machine Lateral Raises", t: "12-15 / 15-20", o: false, nts: "Maintain high continuous mechanical tension profiles." },
+                                    { n: "Rear Delt Cable Fly", t: "12-15 / 15-20", o: true, nts: "Target exact rear standard muscle line structure." },
+                                    { n: "Cable Curl (EZ Bar)", t: "10-12 / 15-20", o: true, nts: "Arm bicep load concentration track." },
+                                    { n: "Rope Hammer Curl", t: "12-15 / 15-20", o: true, nts: "Keep forearm mechanical leverages continuous." },
+                                    { n: "Rope Pushdowns", t: "10-12 / 15-20", o: true, nts: "Tricep finishing isolation tracking." },
+                                    { n: "Overhead Tricep Extensions", t: "10-12 / 12-15", o: true, nts: "Safely extend deep inside structural limits." },
+                                    { n: "Dumbbell or Cable Shrugs", t: "12-15 / 15-20", o: false, nts: "Trap focus profile setup alignment." }
+                                ];
+                                satEx.forEach((ex, idx) => {
+                                    document.write(`
+                                    <tr data-name="${ex.n}" data-calc-type="drop">
+                                        <td>
+                                            <span class="ex-name">${ex.n}</span>${idx===0?'<span class="ex-star">★</span>':''}<span class="auto-calc-display"></span>
+                                            ${ex.o ? '<span class="overlap-highlight">♻️ Multi-Day Continuity: Match weight to last week\'s target, NOT last session!</span>' : ''}
+                                        </td>
+                                        <td>${ex.t} Reps</td>
+                                        <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                        <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                        <td><div class="set-box-pair disabled-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input" disabled placeholder="—"></div></td>
+                                        <td><div class="set-box-pair disabled-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input" disabled placeholder="—"></div></td>
+                                        <td><span class="mod-text">${ex.nts}</span></td>
+                                    </tr>`);
+                                });
+                            </script>
+                            <tr data-name="4x4 VO₂ Max">
+                                <td><span class="ex-name" style="color: #fca5a5;">4x4 VO₂ Max Cardio</span></td>
+                                <td>4 min Intervals</td>
+                                <td><div class="set-box-pair" style="border-color: #fca5a5;"><span class="input-lbl">HR/SPD</span><input type="text" class="sub-input rep-in" placeholder="Rd 1" style="width:65px;"></div></td>
+                                <td><div class="set-box-pair" style="border-color: #fca5a5;"><span class="input-lbl">HR/SPD</span><input type="text" class="sub-input rep-in" placeholder="Rd 2" style="width:65px;"></div></td>
+                                <td><div class="set-box-pair" style="border-color: #fca5a5;"><span class="input-lbl">HR/SPD</span><input type="text" class="sub-input rep-in" placeholder="Rd 3" style="width:65px;"></div></td>
+                                <td><div class="set-box-pair" style="border-color: #fca5a5;"><span class="input-lbl">HR/SPD</span><input type="text" class="sub-input rep-in" placeholder="Rd 4" style="width:65px;"></div></td>
+                                <td><span class="stable-text">High-intensity aerobic output health driver.</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="vo2-guide-container">
+                    <div class="vo2-card-sub"><h4>⏱️ Structure</h4>• 4 min hard / 3 min easy recovery<br>• Repeat 4 total times sequence</div>
+                    <div class="vo2-card-sub"><h4>🔥 Intensity</h4>• Hard: ~90–95% max heart rate<br>• Recovery: Active easy spin/pace</div>
+                    <div class="vo2-card-sub"><h4>⏳ Total Time</h4>• ~35–40 minutes total duration<br>• Includes safe warm/cool downs</div>
+                    <div class="vo2-card-sub"><h4>🚴 Best Modalities</h4>• Assault Bike / Station Bike<br>• Incline Treadmill / Rower</div>
+                </div>
+
+                <div class="history-section"><div class="history-hdr">Saved Log History</div><div class="history-terminal" id="hist-sat">No saved entries.</div></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================= SHOPPING LIST TAB ================= -->
+    <div id="shopping" class="panel">
+        <div class="section-intro">
+            <strong>🛒 2× Weekly Shopping Cadence:</strong> Optimized to ensure produce freshness and clean meal planning. Rice cakes have been removed as requested.
+        </div>
+
+        <div class="shopping-grid">
+            <!-- MONDAY TRIP -->
+            <div class="shop-block">
+                <h4>🔴 Monday Morning Trip (Covers Tue–Fri Prep)</h4>
+                <ul class="directives-list" style="padding-left:14px;">
+                    <li><strong>Chicken Breast:</strong> ~2.5 lbs raw (for batch baking)</li>
+                    <li><strong>90% Lean Ground Beef:</strong> 1.5 lbs</li>
+                    <li><strong>Yellow Potatoes:</strong> ~1.2 lbs raw</li>
+                    <li><strong>Canned Tuna in Water:</strong> 1 can (160g / 5 oz) for Wednesday</li>
+                    <li><strong>Fresh Whole Eggs:</strong> 1 half-carton (4 eggs needed for Wed)</li>
+                    <li><strong>Fresh Vegetables:</strong> 3 bunches Fresh Broccoli, 1 bag fresh Spinach, 1 pack Mushrooms, 1 tub Spring Mix, 1 Cucumber</li>
+                    <li><strong>Daily Fruits:</strong> 4 Bananas, 4 Apples</li>
+                </ul>
+            </div>
+
+            <!-- FRIDAY TRIP -->
+            <div class="shop-block">
+                <h4>🔵 Friday Morning Trip (Covers Sat–Mon Prep)</h4>
+                <ul class="directives-list" style="padding-left:14px;">
+                    <li><strong>Chicken Breast:</strong> ~2.0 lbs raw</li>
+                    <li><strong>90% Lean Ground Beef:</strong> 1.0 lb</li>
+                    <li><strong>Yellow Potatoes:</strong> ~0.8 lbs raw</li>
+                    <li><strong>Canned Tuna in Water:</strong> 1 can (160g / 5 oz) for Sunday</li>
+                    <li><strong>Fresh Whole Eggs:</strong> 4 eggs needed for Sunday</li>
+                    <li><strong>Fresh Vegetables:</strong> 1 bunch Fresh Broccoli, 1 bunch Fresh Asparagus, 1 bag String Beans, 1 bag fresh Spinach, 1 pack Mushrooms, 1 tub Spring Mix, 1 Cucumber, 1 Avocado</li>
+                    <li><strong>Daily Fruits:</strong> 3 Bananas, 3 Apples</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= PREP GUIDE TAB ================= -->
+    <div id="prep" class="panel">
+        <div class="section-intro">
+            <strong>🥘 Deficit Bulk Prep Rules:</strong> Macro proteins and rice are cooked in advance. To preserve crunch and micronutrient density, <u>all greens and vegetables are air-fried or boiled completely fresh right before you eat them</u>.
+        </div>
+
+        <div class="card">
+            <div class="card-title">Monday Batch Prep Session (~45 min | Covers Tue–Fri Macros)</div>
+            <ul class="directives-list">
+                <li><strong>Step 1 — Chicken Breast:</strong> Bake 2.5 lbs raw chicken at 375°F for 22–25 min. Slice and container into **151g cooked blocks** (Tue/Thu/Fri lunch).</li>
+                <li><strong>Step 2 — 90% Lean Ground Beef:</strong> Brown 1.5 lbs in a pan, rinse in a colander to drain excess surface lipids. Separate into **140g cooked anchors** (Tue/Thu/Fri dinner).</li>
+                <li><strong>Step 3 — Jasmine Rice:</strong> Cook 120g dry weight rice. Separate evenly into 3 lunch containers (~40g dry-equivalent weight per block).</li>
+                <li><strong>⚠️ Vegetable Fast Rule:</strong> Do NOT prep or steam broccoli or green strings ahead of time. Store them raw in crisper bins.</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Friday Batch Prep Session (~45 min | Covers Sat–Mon Macros)</div>
+            <ul class="directives-list">
+                <li><strong>Step 1 — Chicken Breast:</strong> Bake 2.0 lbs raw chicken breast. Separate into **151g cooked blocks** (Sat/Mon lunch).</li>
+                <li><strong>Step 2 — 90% Lean Ground Beef:</strong> Brown 1.0 lb. Separate into **140g cooked blocks** (Sat/Mon dinner).</li>
+                <li><strong>Step 3 — Jasmine Rice:</strong> Cook 80g dry weight rice to cover Saturday and Monday lunch allocations.</li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function switchMainTab(tabId, btn) {
+        document.querySelectorAll('.main-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
+        
+        btn.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+
+        let dayNav = document.getElementById('workout-day-nav');
+        if (tabId === 'workout') {
+            dayNav.style.display = 'flex';
+        } else {
+            dayNav.style.display = 'none';
+        }
+    }
+
+    function tabTo(dayId, element) {
+        document.querySelectorAll('.day-pill').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.day-panel').forEach(panel => panel.classList.remove('active'));
+        element.classList.add('active');
+        document.getElementById('panel-' + dayId).classList.add('active');
+    }
+
+    function runLiveCalc(inputElement) {
+        let row = inputElement.closest('tr');
+        let type = row.getAttribute('data-calc-type');
+        let val = parseFloat(inputElement.value);
+        let textDisplay = row.querySelector('.auto-calc-display');
+        
+        if (type === "pyramid") {
+            let card = row.querySelector('.pyramider-card');
+            if (!val || isNaN(val)) {
+                card.style.display = "none";
+                card.innerHTML = "";
+                return;
+            }
+            let s1 = Math.round(val * 0.40);
+            let s2 = Math.round(val * 0.60);
+            let s3 = Math.round(val * 0.80);
+            let prim = Math.round(val * 0.90);
+
+            card.innerHTML = `
+                Top Target Weight: <strong>${val} lbs</strong>
+                <ul style="margin:4px 0 0 0; padding-left:14px; list-style-type:disc; color:#94a3b8;">
+                    <li>Set 1 (40%): <strong>${s1} lbs</strong> × 10 reps</li>
+                    <li>Set 2 (60%): <strong>${s2} lbs</strong> × 6 reps</li>
+                    <li>Set 3 (80%): <strong>${s3} lbs</strong> × 3 reps</li>
+                    <li>Primer (90%): <strong>${prim} lbs</strong> × 1–2 reps</li>
+                </ul>
+            `;
+            card.style.display = "block";
+            
+        } else if (type === "drop") {
+            if (!val || isNaN(val)) { textDisplay.innerHTML = ""; return; }
+            let d10 = Math.round(val * 0.90);
+            let d15 = Math.round(val * 0.85);
+            let d20 = Math.round(val * 0.80);
+            textDisplay.innerHTML = `▼ Drop targets: -10%:${d10} | -15%:${d15} | -20%:${d20}`;
+
+        } else if (type === "assisted") {
+            if (!val || isNaN(val)) { textDisplay.innerHTML = ""; return; }
+            let bwBaseline = 185; 
+            let internalLoad = bwBaseline - val;
+            let a10 = Math.round(bwBaseline - (internalLoad * 0.90)); 
+            let a15 = Math.round(bwBaseline - (internalLoad * 0.85));
+            let a20 = Math.round(bwBaseline - (internalLoad * 0.80));
+            textDisplay.innerHTML = `▲ Assistance stack adjustments: +10%:${a10} lbs | +15%:${a15} lbs | +20%:${a20} lbs`;
+            
+        } else if (type === "bodyweight-added") {
+            if (!val || isNaN(val)) { textDisplay.innerHTML = ""; return; }
+            let bwConstant = 145;
+            let totalLoad = val + bwConstant;
+            textDisplay.innerHTML = `⚖️ Total Load (Stack + 145lb BW): <strong>${totalLoad} lbs</strong>`;
+        }
+    }
+
+    // Upgraded Ledger Saving Function with Live Continuity Updates
+function saveLedger(day) {
+    let dateVal = document.getElementById('date-' + day).value;
+    if(!dateVal) { alert('Please choose a valid log date.'); return; }
+    
+    let rows = document.querySelectorAll('#table-' + day + ' tbody tr');
+    let sessionOutput = `[LOG DATE: ${dateVal}]\n`;
+    let setsDetected = false;
+
+    rows.forEach(row => {
+        let name = row.getAttribute('data-name');
+        if(!name) return;
+        let setPairs = row.querySelectorAll('.set-box-pair:not(.disabled-pair)');
+        let filledSets = [];
+        
+        setPairs.forEach((pair, idx) => {
+            let wtInput = pair.querySelector('.wt-in');
+            let repInput = pair.querySelector('.rep-in');
+            
+            let wt = wtInput ? wtInput.value.trim() : "";
+            let reps = repInput ? repInput.value.trim() : "";
+            
+            if (wt !== "" || reps !== "") {
+                let logStr = wt !== "" ? `${wt}lbs × ${reps||'?'}` : `${reps} reps`;
+                filledSets.push(`Set ${idx+1}: ${logStr}`);
+            }
+        });
+
+        if(filledSets.length > 0) {
+            sessionOutput += ` ➔ ${name} | ${filledSets.join(' | ')}\n`;
+            setsDetected = true;
+        }
+    });
+
+    if(!setsDetected) { alert('No performance entries detected.'); return; }
+
+    let targetBox = document.getElementById('hist-' + day);
+    if(targetBox.innerHTML.includes('No saved entries')) {
+        targetBox.innerHTML = sessionOutput;
+    } else {
+        targetBox.innerHTML = sessionOutput + "\n----------------------------------------\n" + targetBox.innerHTML;
+    }
+
+    // Save history box to localStorage to persist data across page refreshes
+    localStorage.setItem('workout_history_' + day, targetBox.innerHTML);
+    
+    // Reset inputs but maintain live continuity calculations
+    rows.forEach(row => { 
+        row.querySelectorAll('.sub-input:not(:disabled)').forEach(i => i.value = ""); 
+        let disp = row.querySelector('.auto-calc-display');
+        if(disp) disp.innerHTML = "";
+        let card = row.querySelector('.pyramider-card');
+        if(card) { card.innerHTML = ""; card.style.display = "none"; }
+    });
+
+    // Re-trigger automation mappings to update placeholders and colors instantly
+    applyContinuityAndOverload();
+    alert('Session compiled. Multi-day continuity benchmarks refreshed.');
+}
+// Automation Engine for Multi-Day Continuity & Overload Highlights
+function applyContinuityAndOverload() {
+    const days = ['mon', 'tue', 'thu', 'fri', 'sat'];
+    
+    days.forEach(day => {
+        let targetBox = document.getElementById('hist-' + day);
+        if(!targetBox) return;
+
+        // Load saved session from localStorage if present
+        let cachedHistory = localStorage.getItem('workout_history_' + day);
+        if (cachedHistory) {
+            targetBox.innerHTML = cachedHistory;
+        }
+
+        let historyText = targetBox.innerHTML;
+        let rows = document.querySelectorAll('#table-' + day + ' tbody tr');
+
+        rows.forEach(row => {
+            let name = row.getAttribute('data-name');
+            if (!name) return;
+
+            // Step 1: Parse historical layouts to locate the match
+            let escapedName = name.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            let regex = new RegExp(`➔ ${escapedName} \\| ([^\\n]+)`);
+            let match = historyText.match(regex);
+
+            // Step 2: Grab target thresholds to catch overload milestones
+            let cells = row.getElementsByTagName('td');
+            let targetText = cells.length > 1 ? cells[1].innerText : '';
+            // Extracts the highest integer from layouts like "6-8", "8-10 / 12-15"
+            let targetRepsMatch = targetText.match(/\d+/g);
+            let topRepTarget = targetRepsMatch ? Math.max(...targetRepsMatch.map(Number)) : null;
+
+            if (match && match[1]) {
+                let setsData = match[1].split(' | ');
+                let setPairs = row.querySelectorAll('.set-box-pair:not(.disabled-pair)');
+
+                setPairs.forEach((pair, idx) => {
+                    if (setsData[idx]) {
+                        let dataStr = setsData[idx].replace(`Set ${idx+1}: `, '').trim();
+                        let wtInput = pair.querySelector('.wt-in');
+                        let repInput = pair.querySelector('.rep-in');
+
+                        let loggedWt = '';
+                        let loggedReps = '';
+
+                        if (dataStr.includes('lbs ×')) {
+                            let parts = dataStr.split('lbs ×');
+                            loggedWt = parts[0].trim();
+                            loggedReps = parts[1].replace('reps', '').trim();
+                        } else if (dataStr.includes('reps')) {
+                            loggedReps = dataStr.replace('reps', '').trim();
+                        }
+
+                        // Inject Continuity Values into Fields as Placeholders
+                        if (wtInput && loggedWt) wtInput.placeholder = loggedWt;
+                        if (repInput && loggedReps) repInput.placeholder = loggedReps;
+
+                        // Step 3: Evaluate Progressive Overload Milestones
+                        let actualRepsAchieved = parseInt(loggedReps);
+                        if (topRepTarget && !isNaN(actualRepsAchieved) && actualRepsAchieved >= topRepTarget) {
+                            // Hit or exceeded top range: trigger gold highlight border to prompt higher loads
+                            pair.style.border = "2px solid #f59e0b";
+                            pair.style.backgroundColor = "rgba(245, 158, 11, 0.08)";
+                            
+                            // Inject a subtle warning tag near the metrics display
+                            let displayBox = row.querySelector('.auto-calc-display');
+                            if (displayBox && !displayBox.innerHTML.includes('⚡ OVERLOAD')) {
+                                displayBox.innerHTML = `<span style="color:#f59e0b; font-weight:700;">⚡ OVERLOAD CAP HIT (${actualRepsAchieved}/${topRepTarget} reps) — Bump up load next session!</span><br>` + displayBox.innerHTML;
+                            }
+                        } else {
+                            // Restore defaults if targets are not cleared
+                            pair.style.border = "1px solid #334155";
+                            pair.style.backgroundColor = "#1f2937";
+                        }
+                    }
+                });
+            }
+        });
+    });
+}
+
+// Ensure the dashboard triggers structural parsing configurations as soon as the DOM settles
+document.addEventListener("DOMContentLoaded", function() {
+    applyContinuityAndOverload();
+});
+
+// PWA: Register service worker for offline support
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+            .then((reg) => console.log('Service Worker registered:', reg.scope))
+            .catch((err) => console.log('Service Worker registration failed:', err));
+    });
+}
+</script>
+
+</body>
+</html>
