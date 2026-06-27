@@ -58,6 +58,7 @@
 
         .meal-row { margin-bottom: 18px; border-bottom: 1px dashed #1f2937; padding-bottom: 12px; }
         .meal-row:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+        .meal-row:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
         .meal-meta { font-size: 8pt; font-weight: 700; color: #9ca3af; text-transform: uppercase; }
         .meal-name { font-size: 11pt; font-weight: 700; color: #f9fafb; margin: 3px 0; }
         .meal-ingredients { font-size: 9.5pt; color: #d1d5db; line-height: 1.4; }
@@ -446,7 +447,7 @@
             <div class="card">
                 <div class="card-title">
                     <span>Interactive Log: (Thu) Pull Protocol</span>
-                    <span class="badge interactive">Shoulder-Free Framework</span>
+                    <span class="badge interactive">Rear Delt Dynamic Reallocation</span>
                 </div>
                 <div class="log-controls">
                     <span class="log-label">Session Date:</span>
@@ -484,6 +485,7 @@
                                     { n: "Chest-Supported Row", t: "8-10 / 12-15", o: false, nts: "Upper structural back target. Avoid chin thrusts." },
                                     { n: "Single-Arm Cable Pulldown", t: "10-12 / 12-15", o: false, nts: "Isolate unilateral lat paths cleanly." },
                                     { n: "Straight-Arm Pulldown", t: "12-15 / 15-20", o: false, nts: "Strict secondary lat burnout protocol." },
+                                    { n: "Rear Delt Cable Fly", t: "12-15 / 15-20", o: true, nts: "Moved from Push Day. Isolate posterior head along clean horizontal plane lines." },
                                     { n: "Cable EZ Curl", t: "10-12 / 15-20", o: true, nts: "Brachialis execution alignment. Keep elbows tucked." },
                                     { n: "Rope Hammer Curl", t: "10-12 / 12-15", o: true, nts: "Forearm and arm thickness structural anchor." },
                                     { n: "Wrist Curls", t: "12-15 / 15-20", o: false, nts: "Forearm flexor isolation maintenance." },
@@ -558,10 +560,10 @@
                             </tr>
                             <script>
                                 const friEx = [
+                                    { n: "Machine Decline Press", t: "6-8 / 10-12", o: false, nts: "Secondary horizontal compound target. Drive hard into structural backing safely." },
                                     { n: "Pec Dec", t: "10-12 / 12-15", o: false, nts: "Chest isolation squeeze. Limit joint strain extensions." },
                                     { n: "Seated Dumbbell Shoulder Press", t: "8-10 / 12-15", o: true, nts: "Overhead press safety track." },
                                     { n: "Cable Lateral Raise", t: "12-15 / 15-20", o: false, nts: "Medial head priority preservation." },
-                                    { n: "Rear Delt Cable Fly", t: "12-15 / 15-20", o: true, nts: "Posterior head line optimization mapping." },
                                     { n: "Rope Pushdowns", t: "10-12 / 15-20", o: true, nts: "Tricep lateral head expansion track." },
                                     { n: "Overhead Tricep Extensions", t: "10-12 / 12-15", o: true, nts: "Long head stretch activation focus." }
                                 ];
@@ -806,7 +808,6 @@
         }
     }
 
-    // Upgraded Ledger Saving Function with Live Continuity Updates
 function saveLedger(day) {
     let dateVal = document.getElementById('date-' + day).value;
     if(!dateVal) { alert('Please choose a valid log date.'); return; }
@@ -849,10 +850,8 @@ function saveLedger(day) {
         targetBox.innerHTML = sessionOutput + "\n----------------------------------------\n" + targetBox.innerHTML;
     }
 
-    // Save history box to localStorage to persist data across page refreshes
     localStorage.setItem('workout_history_' + day, targetBox.innerHTML);
     
-    // Reset inputs but maintain live continuity calculations
     rows.forEach(row => { 
         row.querySelectorAll('.sub-input:not(:disabled)').forEach(i => i.value = ""); 
         let disp = row.querySelector('.auto-calc-display');
@@ -861,11 +860,10 @@ function saveLedger(day) {
         if(card) { card.innerHTML = ""; card.style.display = "none"; }
     });
 
-    // Re-trigger automation mappings to update placeholders and colors instantly
     applyContinuityAndOverload();
     alert('Session compiled. Multi-day continuity benchmarks refreshed.');
 }
-// Automation Engine for Multi-Day Continuity & Overload Highlights
+
 function applyContinuityAndOverload() {
     const days = ['mon', 'tue', 'thu', 'fri', 'sat'];
     
@@ -873,7 +871,6 @@ function applyContinuityAndOverload() {
         let targetBox = document.getElementById('hist-' + day);
         if(!targetBox) return;
 
-        // Load saved session from localStorage if present
         let cachedHistory = localStorage.getItem('workout_history_' + day);
         if (cachedHistory) {
             targetBox.innerHTML = cachedHistory;
@@ -886,15 +883,12 @@ function applyContinuityAndOverload() {
             let name = row.getAttribute('data-name');
             if (!name) return;
 
-            // Step 1: Parse historical layouts to locate the match
             let escapedName = name.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
             let regex = new RegExp(`➔ ${escapedName} \\| ([^\\n]+)`);
             let match = historyText.match(regex);
 
-            // Step 2: Grab target thresholds to catch overload milestones
             let cells = row.getElementsByTagName('td');
             let targetText = cells.length > 1 ? cells[1].innerText : '';
-            // Extracts the highest integer from layouts like "6-8", "8-10 / 12-15"
             let targetRepsMatch = targetText.match(/\d+/g);
             let topRepTarget = targetRepsMatch ? Math.max(...targetRepsMatch.map(Number)) : null;
 
@@ -919,24 +913,19 @@ function applyContinuityAndOverload() {
                             loggedReps = dataStr.replace('reps', '').trim();
                         }
 
-                        // Inject Continuity Values into Fields as Placeholders
                         if (wtInput && loggedWt) wtInput.placeholder = loggedWt;
                         if (repInput && loggedReps) repInput.placeholder = loggedReps;
 
-                        // Step 3: Evaluate Progressive Overload Milestones
                         let actualRepsAchieved = parseInt(loggedReps);
                         if (topRepTarget && !isNaN(actualRepsAchieved) && actualRepsAchieved >= topRepTarget) {
-                            // Hit or exceeded top range: trigger gold highlight border to prompt higher loads
                             pair.style.border = "2px solid #f59e0b";
                             pair.style.backgroundColor = "rgba(245, 158, 11, 0.08)";
                             
-                            // Inject a subtle warning tag near the metrics display
                             let displayBox = row.querySelector('.auto-calc-display');
                             if (displayBox && !displayBox.innerHTML.includes('⚡ OVERLOAD')) {
                                 displayBox.innerHTML = `<span style="color:#f59e0b; font-weight:700;">⚡ OVERLOAD CAP HIT (${actualRepsAchieved}/${topRepTarget} reps) — Bump up load next session!</span><br>` + displayBox.innerHTML;
                             }
                         } else {
-                            // Restore defaults if targets are not cleared
                             pair.style.border = "1px solid #334155";
                             pair.style.backgroundColor = "#1f2937";
                         }
@@ -947,12 +936,10 @@ function applyContinuityAndOverload() {
     });
 }
 
-// Ensure the dashboard triggers structural parsing configurations as soon as the DOM settles
 document.addEventListener("DOMContentLoaded", function() {
     applyContinuityAndOverload();
 });
 
-// PWA: Register service worker for offline support
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('service-worker.js')
