@@ -58,7 +58,6 @@
 
         .meal-row { margin-bottom: 18px; border-bottom: 1px dashed #1f2937; padding-bottom: 12px; }
         .meal-row:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
-        .meal-row:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
         .meal-meta { font-size: 8pt; font-weight: 700; color: #9ca3af; text-transform: uppercase; }
         .meal-name { font-size: 11pt; font-weight: 700; color: #f9fafb; margin: 3px 0; }
         .meal-ingredients { font-size: 9.5pt; color: #d1d5db; line-height: 1.4; }
@@ -319,34 +318,35 @@
                             <tr data-name="Machine Bench Press" data-calc-type="pyramid">
                                 <td>
                                     <span class="ex-name">Machine Bench Press</span><span class="ex-star">★</span>
-                                    <span class="ex-sublabel">⚙️ Pyramider Warmup System Active</span>
+                                    <span class="ex-sublabel">⚙️ Warmup System Active</span>
                                     <div class="pyramider-card"></div>
                                 </td>
                                 <td>6-8 Reps</td>
                                 <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
-                                <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
                                 <td><span class="stable-text">Primary horizontal driver. Hold Set 1 weight steady.</span></td>
                             </tr>
                             <script>
                                 const monEx = [
-                                    { n: "Lat Pulldown", t: "8-10 / 12-15", o: false, nts: "Back width anchor. Control eccentric tempo on Set 2." },
-                                    { n: "Incline DB Press", t: "6-8 / 10-12", o: false, nts: "Upper chest emphasis. Match week 1 structural baseline." },
-                                    { n: "Seated Row", t: "8-10 / 12-15", o: false, nts: "Mid-back depth. Keep strict posture on both sets." },
-                                    { n: "Seated Dumbbell Shoulder Press", t: "8-10 / 12-15", o: true, nts: "Overhead power preservation." },
-                                    { n: "Face Pulls", t: "12-15 / 15-20", o: false, nts: "Rear delt & rotator cuff alignment focus." },
-                                    { n: "Cable EZ Bar Curl", t: "10-12 / 15-20", o: true, nts: "Arm isolation block. Control contraction peak." },
-                                    { n: "Tricep Pushdowns", t: "10-12 / 15-20", o: false, nts: "Elbow lock extension. Smooth tempo execution." }
+                                    { n: "Lat Pulldown", t: "8-10 / 12-15", o: false, p: false, nts: "Back width anchor. Control eccentric tempo on Set 2." },
+                                    { n: "Incline DB Press", t: "6-8 / 10-12", o: false, p: false, nts: "Upper chest emphasis. Match week 1 structural baseline." },
+                                    { n: "Seated Row", t: "8-10 / 12-15", o: false, p: false, nts: "Mid-back depth. Keep strict posture on both sets." },
+                                    { n: "Seated Dumbbell Shoulder Press", t: "8-10 / 12-15", o: true, p: true, nts: "Overhead power preservation." },
+                                    { n: "Face Pulls", t: "12-15 / 15-20", o: false, p: false, nts: "Rear delt & rotator cuff alignment focus." },
+                                    { n: "Cable EZ Bar Curl", t: "10-12 / 15-20", o: true, p: false, nts: "Arm isolation block. Control contraction peak." },
+                                    { n: "Tricep Pushdowns", t: "10-12 / 15-20", o: false, p: false, nts: "Elbow lock extension. Smooth tempo execution." }
                                 ];
                                 monEx.forEach(ex => {
                                     document.write(`
                                     <tr data-name="${ex.n}" data-calc-type="drop">
                                         <td>
-                                            <span class="ex-name">${ex.n}</span><span class="auto-calc-display"></span>
+                                            <span class="ex-name">${ex.n}</span>${ex.p ? '<span class="ex-star">★</span><span class="ex-sublabel">⚙️ Warmup System Active</span>' : ''}<span class="auto-calc-display"></span>
+                                            <div class="pyramider-card"></div>
                                             ${ex.o ? '<span class="overlap-highlight">♻️ Multi-Day Continuity: Match weight to last week\'s target, NOT last session!</span>' : ''}
                                         </td>
                                         <td>${ex.t} Reps</td>
                                         <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
-                                        <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                        <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
                                         <td><span class="stable-text">${ex.nts}</span></td>
                                     </tr>`);
                                 });
@@ -391,7 +391,7 @@
                                 </td>
                                 <td>6-8 / 10-12</td>
                                 <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
-                                <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
                                 <td><div class="set-box-pair disabled-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input" disabled placeholder="—"></div></td>
                                 <td><span class="danger-text">⚠️ KNEE PROTECTION: Strict 1x Drop Max. High & wide feet. 3s eccentric. No bouncing.</span></td>
                             </tr>
@@ -409,11 +409,12 @@
                                     <tr data-name="${ex.n}" data-calc-type="${ex.c}">
                                         <td>
                                             <span class="ex-name">${ex.n}</span><span class="auto-calc-display"></span>
+                                            <div class="pyramider-card"></div>
                                             ${ex.o ? '<span class="overlap-highlight">♻️ Multi-Day Continuity: Match weight to last week\'s target, NOT last session!</span>' : ''}
                                         </td>
                                         <td>${ex.t} Reps</td>
                                         <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
-                                        <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                        <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
                                         <td><div class="set-box-pair disabled-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input" disabled placeholder="—"></div></td>
                                         <td><span class="mod-text">${ex.nts}</span></td>
                                     </tr>`);
@@ -475,7 +476,7 @@
                                 </td>
                                 <td>Triple Drop System</td>
                                 <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="60" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
-                                <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="70"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="70" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
                                 <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="90"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
                                 <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
                                 <td><span class="stable-text">🔄 INVERTED COUNTER-BALANCE: Enter top stack setting.</span></td>
@@ -496,11 +497,12 @@
                                     <tr data-name="${ex.n}" data-calc-type="drop">
                                         <td>
                                             <span class="ex-name">${ex.n}</span><span class="auto-calc-display"></span>
+                                            <div class="pyramider-card"></div>
                                             ${ex.o ? '<span class="overlap-highlight">♻️ Multi-Day Continuity: Match weight to last week\'s target, NOT last session!</span>' : ''}
                                         </td>
                                         <td>${ex.t} Reps</td>
                                         <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
-                                        <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                        <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
                                         <td><div class="set-box-pair disabled-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input" disabled placeholder="—"></div></td>
                                         <td><div class="set-box-pair disabled-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input" disabled placeholder="—"></div></td>
                                         <td><span class="mod-text">${ex.nts}</span></td>
@@ -555,28 +557,29 @@
                                 </td>
                                 <td>6-8 Reps</td>
                                 <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
-                                <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
                                 <td><span class="stable-text">Fixed structural path driver. Complete mechanical control emphasis.</span></td>
                             </tr>
                             <script>
                                 const friEx = [
-                                    { n: "Machine Decline Press", t: "6-8 / 10-12", o: false, nts: "Secondary horizontal compound target. Drive hard into structural backing safely." },
-                                    { n: "Pec Dec", t: "10-12 / 12-15", o: false, nts: "Chest isolation squeeze. Limit joint strain extensions." },
-                                    { n: "Seated Dumbbell Shoulder Press", t: "8-10 / 12-15", o: true, nts: "Overhead press safety track." },
-                                    { n: "Cable Lateral Raise", t: "12-15 / 15-20", o: false, nts: "Medial head priority preservation." },
-                                    { n: "Rope Pushdowns", t: "10-12 / 15-20", o: true, nts: "Tricep lateral head expansion track." },
-                                    { n: "Overhead Tricep Extensions", t: "10-12 / 12-15", o: true, nts: "Long head stretch activation focus." }
+                                    { n: "Machine Decline Press", t: "6-8 / 10-12", o: false, p: false, nts: "Secondary horizontal compound target. Drive hard into structural backing safely." },
+                                    { n: "Pec Dec", t: "10-12 / 12-15", o: false, p: false, nts: "Chest isolation squeeze. Limit joint strain extensions." },
+                                    { n: "Seated Dumbbell Shoulder Press", t: "8-10 / 12-15", o: true, p: true, nts: "Overhead press safety track." },
+                                    { n: "Cable Lateral Raise", t: "12-15 / 15-20", o: false, p: false, nts: "Medial head priority preservation." },
+                                    { n: "Rope Pushdowns", t: "10-12 / 15-20", o: true, p: false, nts: "Tricep lateral head expansion track." },
+                                    { n: "Overhead Tricep Extensions", t: "10-12 / 12-15", o: true, p: false, nts: "Long head stretch activation focus." }
                                 ];
                                 friEx.forEach(ex => {
                                     document.write(`
                                     <tr data-name="${ex.n}" data-calc-type="drop">
                                         <td>
-                                            <span class="ex-name">${ex.n}</span><span class="auto-calc-display"></span>
+                                            <span class="ex-name">${ex.n}</span>${ex.p ? '<span class="ex-star">★</span><span class="ex-sublabel">⚙️ Warmup System Active</span>' : ''}<span class="auto-calc-display"></span>
+                                            <div class="pyramider-card"></div>
                                             ${ex.o ? '<span class="overlap-highlight">♻️ Multi-Day Continuity: Match weight to last week\'s target, NOT last session!</span>' : ''}
                                         </td>
                                         <td>${ex.t} Reps</td>
                                         <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
-                                        <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                        <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
                                         <td><span class="mod-text">${ex.nts}</span></td>
                                     </tr>`);
                                 });
@@ -616,25 +619,26 @@
                         <tbody>
                             <script>
                                 const satEx = [
-                                    { n: "Seated DB Shoulder Press", t: "8-10 / 12-15", o: true, nts: "Primary overhead builder preservation focus." },
-                                    { n: "Machine Lateral Raises", t: "12-15 / 15-20", o: false, nts: "Maintain high continuous mechanical tension profiles." },
-                                    { n: "Rear Delt Cable Fly", t: "12-15 / 15-20", o: true, nts: "Target exact rear standard muscle line structure." },
-                                    { n: "Cable Curl (EZ Bar)", t: "10-12 / 15-20", o: true, nts: "Arm bicep load concentration track." },
-                                    { n: "Rope Hammer Curl", t: "12-15 / 15-20", o: true, nts: "Keep forearm mechanical leverages continuous." },
-                                    { n: "Rope Pushdowns", t: "10-12 / 15-20", o: true, nts: "Tricep finishing isolation tracking." },
-                                    { n: "Overhead Tricep Extensions", t: "10-12 / 12-15", o: true, nts: "Safely extend deep inside structural limits." },
-                                    { n: "Dumbbell or Cable Shrugs", t: "12-15 / 15-20", o: false, nts: "Trap focus profile setup alignment." }
+                                    { n: "Seated DB Shoulder Press", t: "8-10 / 12-15", o: true, p: true, nts: "Primary overhead builder preservation focus." },
+                                    { n: "Machine Lateral Raises", t: "12-15 / 15-20", o: false, p: false, nts: "Maintain high continuous mechanical tension profiles." },
+                                    { n: "Rear Delt Cable Fly", t: "12-15 / 15-20", o: true, p: false, nts: "Target exact rear standard muscle line structure." },
+                                    { n: "Cable Curl (EZ Bar)", t: "10-12 / 15-20", o: true, p: false, nts: "Arm bicep load concentration track." },
+                                    { n: "Rope Hammer Curl", t: "12-15 / 15-20", o: true, p: false, nts: "Keep forearm mechanical leverages continuous." },
+                                    { n: "Rope Pushdowns", t: "10-12 / 15-20", o: true, p: false, nts: "Tricep finishing isolation tracking." },
+                                    { n: "Overhead Tricep Extensions", t: "10-12 / 12-15", o: true, p: false, nts: "Safely extend deep inside structural limits." },
+                                    { n: "Dumbbell or Cable Shrugs", t: "12-15 / 15-20", o: false, p: false, nts: "Trap focus profile setup alignment." }
                                 ];
                                 satEx.forEach((ex, idx) => {
                                     document.write(`
                                     <tr data-name="${ex.n}" data-calc-type="drop">
                                         <td>
-                                            <span class="ex-name">${ex.n}</span>${idx===0?'<span class="ex-star">★</span>':''}<span class="auto-calc-display"></span>
+                                            <span class="ex-name">${ex.n}</span>${ex.p ? '<span class="ex-star">★</span><span class="ex-sublabel">⚙️ Warmup System Active</span>' : ''}<span class="auto-calc-display"></span>
+                                            <div class="pyramider-card"></div>
                                             ${ex.o ? '<span class="overlap-highlight">♻️ Multi-Day Continuity: Match weight to last week\'s target, NOT last session!</span>' : ''}
                                         </td>
                                         <td>${ex.t} Reps</td>
                                         <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
-                                        <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
+                                        <td><div class="set-box-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input wt-in" placeholder="lbs" oninput="runLiveCalc(this)"><span class="input-lbl">RPS</span><input type="text" class="sub-input rep-in" placeholder="reps"></div></td>
                                         <td><div class="set-box-pair disabled-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input" disabled placeholder="—"></div></td>
                                         <td><div class="set-box-pair disabled-pair"><span class="input-lbl">WT</span><input type="text" class="sub-input" disabled placeholder="—"></div></td>
                                         <td><span class="mod-text">${ex.nts}</span></td>
@@ -760,12 +764,11 @@
         let type = row.getAttribute('data-calc-type');
         let val = parseFloat(inputElement.value);
         let textDisplay = row.querySelector('.auto-calc-display');
+        let card = row.querySelector('.pyramider-card');
         
         if (type === "pyramid") {
-            let card = row.querySelector('.pyramider-card');
             if (!val || isNaN(val)) {
-                card.style.display = "none";
-                card.innerHTML = "";
+                if (card) { card.style.display = "none"; card.innerHTML = ""; }
                 return;
             }
             let s1 = Math.round(val * 0.40);
@@ -773,38 +776,62 @@
             let s3 = Math.round(val * 0.80);
             let prim = Math.round(val * 0.90);
 
-            card.innerHTML = `
-                Top Target Weight: <strong>${val} lbs</strong>
-                <ul style="margin:4px 0 0 0; padding-left:14px; list-style-type:disc; color:#94a3b8;">
-                    <li>Set 1 (40%): <strong>${s1} lbs</strong> × 10 reps</li>
-                    <li>Set 2 (60%): <strong>${s2} lbs</strong> × 6 reps</li>
-                    <li>Set 3 (80%): <strong>${s3} lbs</strong> × 3 reps</li>
-                    <li>Primer (90%): <strong>${prim} lbs</strong> × 1–2 reps</li>
-                </ul>
-            `;
-            card.style.display = "block";
+            if (card) {
+                card.innerHTML = `
+                    Top Target Weight: <strong>${val} lbs</strong>
+                    <ul style="margin:4px 0 0 0; padding-left:14px; list-style-type:disc; color:#94a3b8;">
+                        <li>Set 1 (40%): <strong>${s1} lbs</strong> × 10 reps</li>
+                        <li>Set 2 (60%): <strong>${s2} lbs</strong> × 6 reps</li>
+                        <li>Set 3 (80%): <strong>${s3} lbs</strong> × 3 reps</li>
+                        <li>Primer (90%): <strong>${prim} lbs</strong> × 1–2 reps</li>
+                    </ul>
+                `;
+                card.style.display = "block";
+            }
             
         } else if (type === "drop") {
-            if (!val || isNaN(val)) { textDisplay.innerHTML = ""; return; }
+            if (!val || isNaN(val)) { 
+                if (textDisplay) textDisplay.innerHTML = ""; 
+                if (card) { card.style.display = "none"; card.innerHTML = ""; }
+                return; 
+            }
             let d10 = Math.round(val * 0.90);
             let d15 = Math.round(val * 0.85);
             let d20 = Math.round(val * 0.80);
-            textDisplay.innerHTML = `▼ Drop targets: -10%:${d10} | -15%:${d15} | -20%:${d20}`;
+            if (textDisplay) textDisplay.innerHTML = `▼ Drop targets: -10%:${d10} | -15%:${d15} | -20%:${d20}`;
+
+            // Check if this exercise row also has the "Warmup System Active" trait flag
+            if (card && row.innerHTML.includes('Warmup System Active')) {
+                let s1 = Math.round(val * 0.40);
+                let s2 = Math.round(val * 0.60);
+                let s3 = Math.round(val * 0.80);
+                let prim = Math.round(val * 0.90);
+                card.innerHTML = `
+                    Top Target Weight: <strong>${val} lbs</strong>
+                    <ul style="margin:4px 0 0 0; padding-left:14px; list-style-type:disc; color:#94a3b8;">
+                        <li>Set 1 (40%): <strong>${s1} lbs</strong> × 10 reps</li>
+                        <li>Set 2 (60%): <strong>${s2} lbs</strong> × 6 reps</li>
+                        <li>Set 3 (80%): <strong>${s3} lbs</strong> × 3 reps</li>
+                        <li>Primer (90%): <strong>${prim} lbs</strong> × 1–2 reps</li>
+                    </ul>
+                `;
+                card.style.display = "block";
+            }
 
         } else if (type === "assisted") {
-            if (!val || isNaN(val)) { textDisplay.innerHTML = ""; return; }
+            if (!val || isNaN(val)) { if (textDisplay) textDisplay.innerHTML = ""; return; }
             let bwBaseline = 185; 
             let internalLoad = bwBaseline - val;
             let a10 = Math.round(bwBaseline - (internalLoad * 0.90)); 
             let a15 = Math.round(bwBaseline - (internalLoad * 0.85));
             let a20 = Math.round(bwBaseline - (internalLoad * 0.80));
-            textDisplay.innerHTML = `▲ Assistance stack adjustments: +10%:${a10} lbs | +15%:${a15} lbs | +20%:${a20} lbs`;
+            if (textDisplay) textDisplay.innerHTML = `▲ Assistance stack adjustments: +10%:${a10} lbs | +15%:${a15} lbs | +20%:${a20} lbs`;
             
         } else if (type === "bodyweight-added") {
-            if (!val || isNaN(val)) { textDisplay.innerHTML = ""; return; }
+            if (!val || isNaN(val)) { if (textDisplay) textDisplay.innerHTML = ""; return; }
             let bwConstant = 145;
             let totalLoad = val + bwConstant;
-            textDisplay.innerHTML = `⚖️ Total Load (Stack + 145lb BW): <strong>${totalLoad} lbs</strong>`;
+            if (textDisplay) textDisplay.innerHTML = `⚖️ Total Load (Stack + 145lb BW): <strong>${totalLoad} lbs</strong>`;
         }
     }
 
@@ -831,7 +858,7 @@ function saveLedger(day) {
             
             if (wt !== "" || reps !== "") {
                 let logStr = wt !== "" ? `${wt}lbs × ${reps||'?'}` : `${reps} reps`;
-                filledSets.push(`Set ${idx+1}: ${logStr}`);
+                filledSets.push("Set " + (idx+1) + ": " + logStr);
             }
         });
 
@@ -898,7 +925,7 @@ function applyContinuityAndOverload() {
 
                 setPairs.forEach((pair, idx) => {
                     if (setsData[idx]) {
-                        let dataStr = setsData[idx].replace(`Set ${idx+1}: `, '').trim();
+                        let dataStr = setsData[idx].replace("Set " + (idx+1) + ": ", '').trim();
                         let wtInput = pair.querySelector('.wt-in');
                         let repInput = pair.querySelector('.rep-in');
 
